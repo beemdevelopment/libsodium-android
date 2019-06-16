@@ -1,0 +1,97 @@
+apply plugin: 'com.android.library'
+
+import org.gradle.internal.os.OperatingSystem
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0.18.0"
+
+        defaultConfig {
+            ndk {
+                moduleName "sodium-jni"
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            }
+        }
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDir "jniLibs"
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "jni/CMakeLists.txt"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    def arches = [
+            [android: 'armeabi-v7a', sodium: 'armv7-a', sodium_out: 'armv7-a'],
+            [android: 'arm64-v8a', sodium: 'armv8-a', sodium_out: 'armv8-a'],
+            [android: 'x86', sodium: 'x86', sodium_out: 'i686'],
+            [android: 'x86_64', sodium: 'x86_64', sodium_out: 'westmere']
+    ]
+
+    arches.each { arch ->
+        def compileTask = "compileSodium_${arch['android']}"
+
+        task (compileTask) {
+            def dir = '../libsodium'
+            inputs.dir  fileTree(dir: "${dir}/src", exclude: ["${dir}/**/.libs", "${dir}/*.la", "${dir}/**/*.lo", "${dir}/**/*.o", "${dir}/**/*.Plo", "**/Makefile", "**/Makefile.in", "**/.deps/*", "**/.libs/*"])
+            outputs.dir("${dir}/libsodium-android-${arch['sodium_out']}")
+            doFirst {
+                exec {
+                    workingDir dir
+                    if (OperatingSystem.current().isWindows()) {
+                        commandLine "wsl", "./autogen.sh"
+                    } else {
+                        commandLine "./autogen.sh"
+                    }
+                }
+                exec {
+                    workingDir dir
+                    environment 'LIBSODIUM_FULL_BUILD', 'true'
+                    def script = "./dist-build/android-${arch['sodium']}.sh"
+                    if (OperatingSystem.current().isWindows()) {
+                        environment 'ANDROID_NDK_HOME', "/opt/android-ndk"
+                        environment 'WSLENV', "LIBSODIUM_FULL_BUILD/u:ANDROID_NDK_HOME/u"
+                        commandLine "wsl", script
+                    } else {
+                        environment 'ANDROID_NDK_HOME', android.ndkDirectory
+                        commandLine script
+                    }
+                }
+            }
+        }
+
+        gradle.projectsEvaluated {
+            externalNativeBuildDebug.dependsOn compileTask
+            externalNativeBuildRelease.dependsOn compileTask
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:core:1.2.0'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}
