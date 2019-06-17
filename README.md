@@ -1,4 +1,4 @@
-# libsodium-android [![Build Status](https://travis-ci.com/alexbakker/libsodium-android.svg)](https://travis-ci.com/alexbakker/libsodium-android)
+# libsodium-android [![Build Status](https://travis-ci.com/beemdevelopment/libsodium-android.svg?branch=master)](https://travis-ci.com/beemdevelopment/libsodium-android)
 
 __libsodium-android__ is the library used in [Aegis
 Authenticator](https://github.com/beemdevelopment/Aegis) for JNI bindings to
