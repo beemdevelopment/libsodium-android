@@ -46,6 +46,10 @@ android {
             [android: 'x86', sodium: 'x86', sodium_out: 'i686'],
             [android: 'x86_64', sodium: 'x86_64', sodium_out: 'westmere']
     ]
+    compileOptions {
+        targetCompatibility = '1.8'
+        sourceCompatibility = '1.8'
+    }
 
     arches.each { arch ->
         def compileTask = "compileSodium_${arch['android']}"
