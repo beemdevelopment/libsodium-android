@@ -13,8 +13,8 @@ public class Sodium {
         System.loadLibrary("sodium-jni");
     }
 
-    public static int init() {
-        return SodiumJNI.sodium_init();
+    public static boolean init() {
+        return SodiumJNI.sodium_init() != -1;
     }
 
     public static int crypto_pwhash_scryptsalsa208sha256_ll(byte[] passwd, byte[] salt, long N, int r, int p, byte[] key) {
