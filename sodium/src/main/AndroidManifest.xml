@@ -1,7 +1,2 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.beemdevelopment.sodium">
-
-    <application
-        android:allowBackup="false"
-        android:label="Libsodium for Android"/>
+<manifest package="com.beemdevelopment.sodium">
 </manifest>
