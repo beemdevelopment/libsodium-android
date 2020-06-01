@@ -13,9 +13,6 @@ env:
     #- API=21 ABI=armeabi-v7a
     #- API=24 ABI=arm64-v8a
     - API=29 ABI=x86_64
-android:
-  components:
-    - tools
 before_install:
   - mkdir -p $ANDROID_HOME/licenses
   - echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_HOME/licenses/android-sdk-license
